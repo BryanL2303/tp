@@ -86,7 +86,7 @@ public class MainApp extends Application {
                 isSampleData = true;
             }
             initialData = taskMasterProOptional.orElseGet(SampleDataUtil::getSampleTaskMasterPro);
-        } catch (DataLoadingException e) {
+        } catch (Exception e) {
             logger.warning("Data file at " + storage.getTaskMasterProFilePath() + " could not be loaded."
                     + " Will be starting with a default TaskMasterPro.");
             initialData = SampleDataUtil.getSampleTaskMasterPro();
