@@ -4,24 +4,43 @@ package seedu.address.model.task;
  * Represents the status of a task, which can be either completed or in progress.
  */
 public class TaskStatus {
-    private boolean status;
+    private boolean isCompleted;
 
+    /**
+     * Constructs a {@code TaskStatus}.
+     *
+     * @param taskStatus A valid boolean.
+     */
     public TaskStatus(boolean taskStatus) {
-        status = taskStatus;
+        isCompleted = taskStatus;
+    }
+
+    /**
+     * Constructs a {@code TaskStatus}.
+     *
+     * @param taskStatus A valid String.
+     */
+    public TaskStatus(String taskStatus) {
+        assert taskStatus != null;
+        if (taskStatus.equals("Completed")) {
+            isCompleted = true;
+        } else if (taskStatus.equals("In Progress")) {
+            isCompleted = false;
+        }
     }
     public void setTaskDone() {
-        status = true;
+        isCompleted = true;
     }
     public void setTaskNotDone() {
-        status = false;
+        isCompleted = false;
     }
     public boolean getStatus() {
-        return status;
+        return isCompleted;
     }
 
     @Override
     public String toString() {
-        if (status) {
+        if (isCompleted) {
             return "Completed";
         } else {
             return "In Progress";

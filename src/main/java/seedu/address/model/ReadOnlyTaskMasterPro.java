@@ -5,7 +5,7 @@ import seedu.address.model.employee.Employee;
 import seedu.address.model.task.Task;
 
 /**
- * Unmodifiable view of an address book
+ * Unmodifiable view of TaskMasterPro
  */
 public interface ReadOnlyTaskMasterPro {
 

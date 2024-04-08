@@ -34,10 +34,10 @@ public class EditEmployeeDescriptorBuilder {
      */
     public EditEmployeeDescriptorBuilder(Employee employee) {
         descriptor = new EditCommand.EditEmployeeDescriptor();
-        descriptor.setName(employee.getName());
-        descriptor.setPhone(employee.getPhone());
-        descriptor.setEmail(employee.getEmail());
-        descriptor.setAddress(employee.getAddress());
+        descriptor.setName(new Name(employee.getName()));
+        descriptor.setPhone(new Phone(employee.getPhone()));
+        descriptor.setEmail(new Email(employee.getEmail()));
+        descriptor.setAddress(new Address(employee.getAddress()));
         descriptor.setTasks(employee.getTasks());
         descriptor.setTags(employee.getTags());
     }

@@ -26,6 +26,7 @@ public class AssignTaskCommand extends Command {
 
     /**
      * Creates an AssignTaskCommand to assign a task to an employee.
+     *
      * @param taskID The ID of the task to be assigned.
      * @param employeeID The ID of the employee to whom the task is assigned.
      */
@@ -36,38 +37,50 @@ public class AssignTaskCommand extends Command {
 
     /**
      * Executes the AssignTaskCommand to assign a task to an employee.
+     *
      * @param model The model in which the command should be executed.
      * @return The result of the command execution.
      * @throws CommandException If there is an error executing the command.
      */
     @Override
     public CommandResult execute(Model model) throws CommandException {
+        model.updateFilteredTaskList(Model.PREDICATE_SHOW_ALL_TASKS);
+        model.updateFilteredEmployeeList(Model.PREDICATE_SHOW_ALL_EMPLOYEES);
         List<Task> taskList = model.getFilteredTaskList();
         List<Employee> employeeList = model.getFilteredEmployeeList();
 
-        boolean checkTaskID = false;
-        boolean checkEmployeeID = false;
+        Task assignTask = null;
+        Employee assignEmployee = null;
 
         for (Task t : taskList) {
-            if (t.getTaskId().taskId == taskID) {
-                checkTaskID = true;
-                for (Employee e : employeeList) {
-                    if (e.getEmployeeId().employeeId == employeeID) {
-                        checkEmployeeID = true;
-                        Employee updatedEmployee = e.assignTask(taskID);
-                        model.setEmployee(e, updatedEmployee);
-                    }
-                }
+            if (t.getTaskId() == taskID) {
+                assignTask = t;
+                break;
+            }
+        }
+        for (Employee e : employeeList) {
+            if (e.getEmployeeId() == employeeID) {
+                assignEmployee = e;
+                break;
             }
         }
 
-        if (!checkTaskID) {
+        if (assignTask != null && assignEmployee != null) {
+            Employee updatedEmployee = assignEmployee.assignTask(assignTask);
+            model.setEmployee(assignEmployee, updatedEmployee);
+
+            Task updatedTask = assignTask.assignEmployee(assignEmployee);
+            model.setTask(assignTask, updatedTask);
+        }
+
+        if (assignTask == null) {
             throw new CommandException(Messages.MESSAGE_INVALID_TASKID);
         }
 
-        if (!checkEmployeeID) {
+        if (assignEmployee == null) {
             throw new CommandException(Messages.MESSAGE_INVALID_EMPLOYEEID);
         }
+
         return new CommandResult(MESSAGE_ASSIGN_TASK_SUCCESS);
     }
 }

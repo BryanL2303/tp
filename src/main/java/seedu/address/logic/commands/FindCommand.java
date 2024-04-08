@@ -8,7 +8,7 @@ import seedu.address.model.Model;
 import seedu.address.model.employee.NameContainsKeywordsPredicate;
 
 /**
- * Finds and lists all employees in address book whose name contains any of the argument keywords.
+ * Finds and lists all employees in TaskMasterPro whose name contains any of the argument keywords.
  * Keyword matching is case insensitive.
  */
 public class FindCommand extends Command {
@@ -31,7 +31,8 @@ public class FindCommand extends Command {
         requireNonNull(model);
         model.updateFilteredEmployeeList(predicate);
         return new CommandResult(
-                String.format(Messages.MESSAGE_EMPLOYEES_LISTED_OVERVIEW, model.getFilteredEmployeeList().size()));
+                String.format(Messages.MESSAGE_EMPLOYEES_LISTED_OVERVIEW, model.getFilteredEmployeeList().size()),
+                false, true, false, false);
     }
 
     @Override

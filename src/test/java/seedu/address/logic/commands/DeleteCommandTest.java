@@ -30,7 +30,7 @@ public class DeleteCommandTest {
     @Test
     public void execute_validIndexUnfilteredList_success() {
         Employee employeeToDelete = model.getFilteredEmployeeList().get(INDEX_FIRST_EMPLOYEE.getZeroBased());
-        DeleteCommand deleteCommand = new DeleteCommand(employeeToDelete.getEmployeeId().employeeId);
+        DeleteCommand deleteCommand = new DeleteCommand(employeeToDelete.getEmployeeId());
 
         String expectedMessage = String.format(DeleteCommand.MESSAGE_DELETE_EMPLOYEE_SUCCESS,
                 Messages.format(employeeToDelete));
@@ -54,7 +54,7 @@ public class DeleteCommandTest {
         showEmployeeAtIndex(model, INDEX_FIRST_EMPLOYEE);
 
         Employee employeeToDelete = model.getFilteredEmployeeList().get(INDEX_FIRST_EMPLOYEE.getZeroBased());
-        DeleteCommand deleteCommand = new DeleteCommand(employeeToDelete.getEmployeeId().employeeId);
+        DeleteCommand deleteCommand = new DeleteCommand(employeeToDelete.getEmployeeId());
 
         String expectedMessage = String.format(DeleteCommand.MESSAGE_DELETE_EMPLOYEE_SUCCESS,
                 Messages.format(employeeToDelete));
@@ -71,7 +71,7 @@ public class DeleteCommandTest {
         showEmployeeAtIndex(model, INDEX_FIRST_EMPLOYEE);
 
         Index outOfBoundIndex = INDEX_SECOND_EMPLOYEE;
-        // ensures that outOfBoundIndex is still in bounds of address book list
+        // ensures that outOfBoundIndex is still in bounds of TaskMasterPro list
         assertTrue(outOfBoundIndex.getZeroBased() < model.getTaskMasterPro().getEmployeeList().size());
 
         DeleteCommand deleteCommand = new DeleteCommand(-1);

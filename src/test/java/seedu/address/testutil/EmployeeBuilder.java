@@ -47,10 +47,10 @@ public class EmployeeBuilder {
      * Initializes the EmployeeBuilder with the data of {@code employeeToCopy}.
      */
     public EmployeeBuilder(Employee employeeToCopy) {
-        name = employeeToCopy.getName();
-        phone = employeeToCopy.getPhone();
-        email = employeeToCopy.getEmail();
-        address = employeeToCopy.getAddress();
+        name = new Name(employeeToCopy.getName());
+        phone = new Phone(employeeToCopy.getPhone());
+        email = new Email(employeeToCopy.getEmail());
+        address = new Address(employeeToCopy.getAddress());
         tasks = employeeToCopy.getTasks();
         tags = new HashSet<>(employeeToCopy.getTags());
     }

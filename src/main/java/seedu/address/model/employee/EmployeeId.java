@@ -4,7 +4,7 @@ package seedu.address.model.employee;
  * Represents an Employee's Id.
  */
 public class EmployeeId {
-    public final int employeeId;
+    private final int employeeId;
 
     /**
      * Constructs a {@code EmployeeId}.
@@ -13,6 +13,15 @@ public class EmployeeId {
      */
     public EmployeeId(int id) {
         employeeId = id;
+    }
+
+    /**
+     * Getter for employeeId
+     *
+     * @return employeeId for this employee
+     */
+    public int getEmployeeId() {
+        return employeeId;
     }
 
     @Override

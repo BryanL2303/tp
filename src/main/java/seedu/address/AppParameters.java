@@ -29,6 +29,9 @@ public class AppParameters {
 
     /**
      * Parses the application command-line parameters.
+     *
+     * @param parameters The javafx application parameters
+     * @return The parsed command-line parameters
      */
     public static AppParameters parse(Application.Parameters parameters) {
         AppParameters appParameters = new AppParameters();

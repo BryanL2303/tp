@@ -15,7 +15,7 @@ import seedu.address.model.employee.Employee;
 import seedu.address.model.task.Task;
 
 /**
- * Represents the in-memory model of the address book data.
+ * Represents the in-memory model of TaskMasterPro data.
  */
 public class ModelManager implements Model {
     private static final Logger logger = LogsCenter.getLogger(ModelManager.class);
@@ -144,7 +144,6 @@ public class ModelManager implements Model {
         taskMasterPro.addTask(task);
         updateFilteredTaskList(PREDICATE_SHOW_ALL_TASKS);
     }
-
     @Override
     public void updateFilteredTaskList(Predicate<Task> predicate) {
         requireNonNull(predicate);
@@ -154,6 +153,13 @@ public class ModelManager implements Model {
     @Override
     public void deleteTask(Task target) {
         taskMasterPro.removeTask(target);
+    }
+
+    @Override
+    public void setTask(Task target, Task editedTask) {
+        requireAllNonNull(target, editedTask);
+
+        taskMasterPro.setTask(target, editedTask);
     }
 
     @Override

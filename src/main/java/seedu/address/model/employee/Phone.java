@@ -4,16 +4,15 @@ import static java.util.Objects.requireNonNull;
 import static seedu.address.commons.util.AppUtil.checkArgument;
 
 /**
- * Represents an Employee's phone number in the address book.
+ * Represents an Employee's phone number in TaskMasterPro.
  * Guarantees: immutable; is valid as declared in {@link #isValidPhone(String)}
  */
 public class Phone {
-
-
     public static final String MESSAGE_CONSTRAINTS =
-            "Phone numbers should only contain numbers, and it should be at least 3 digits long";
-    public static final String VALIDATION_REGEX = "\\d{3,}";
-    public final String value;
+            "Phone numbers should only contain numbers, should start with either 6, 8 or 9, "
+                    + "and should be exactly 8 digits long";
+    private static final String VALIDATION_REGEX = "[689]\\d{7}";
+    private final String value;
 
     /**
      * Constructs a {@code Phone}.

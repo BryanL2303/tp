@@ -39,17 +39,17 @@ public interface Model {
     void setGuiSettings(GuiSettings guiSettings);
 
     /**
-     * Returns the user prefs' address book file path.
+     * Returns the user prefs' TaskMasterPro file path.
      */
     Path getTaskMasterProFilePath();
 
     /**
-     * Sets the user prefs' address book file path.
+     * Sets the user prefs' TaskMasterPro file path.
      */
     void setTaskMasterProFilePath(Path taskMasterProFilePath);
 
     /**
-     * Replaces address book data with the data in {@code taskMasterPro}.
+     * Replaces TaskMasterPro data with the data in {@code taskMasterPro}.
      */
     void setTaskMasterPro(ReadOnlyTaskMasterPro taskMasterPro);
 
@@ -57,27 +57,27 @@ public interface Model {
     ReadOnlyTaskMasterPro getTaskMasterPro();
 
     /**
-     * Returns true if a employee with the same identity as {@code employee} exists in the address book.
+     * Returns true if a employee with the same identity as {@code employee} exists in the TaskMasterPro.
      */
     boolean hasEmployee(Employee employee);
 
     /**
      * Deletes the given employee.
-     * The employee must exist in the address book.
+     * The employee must exist in the TaskMasterPro.
      */
     void deleteEmployee(Employee target);
 
     /**
      * Adds the given employee.
-     * {@code employee} must not already exist in the address book.
+     * {@code employee} must not already exist in the TaskMasterPro.
      */
     void addEmployee(Employee employee);
 
     /**
      * Replaces the given employee {@code target} with {@code editedEmployee}.
-     * {@code target} must exist in the address book.
+     * {@code target} must exist in the TaskMasterPro.
      * The employee identity of {@code editedEmployee} must not be the same as
-     * another existing employee in the address book.
+     * another existing employee in the TaskMasterPro.
      */
     void setEmployee(Employee target, Employee editedEmployee);
 
@@ -86,24 +86,34 @@ public interface Model {
 
     /**
      * Updates the filter of the filtered employee list to filter by the given {@code predicate}.
+     *
      * @throws NullPointerException if {@code predicate} is null.
      */
     void updateFilteredEmployeeList(Predicate<Employee> predicate);
 
     /**
      * Adds the given task.
-     * {@code task} must not already exist in the address book.
+     * {@code task} must not already exist in the TaskMasterPro.
      */
     void addTask(Task task);
 
     /**
      * Deletes the given task.
-     * The task must exist in the address book.
+     * The task must exist in the TaskMasterPro.
      */
     void deleteTask(Task target);
 
     /**
+     * Replaces the given employee {@code target} with {@code editedEmployee}.
+     * {@code target} must exist in the TaskMasterPro.
+     * The employee identity of {@code editedEmployee} must not be the same as
+     * another existing employee in the TaskMasterPro.
+     */
+    void setTask(Task target, Task editedTask);
+
+    /**
      * Updates the filter of the filtered task list to filter by the given {@code predicate}.
+     *
      * @throws NullPointerException if {@code predicate} is null.
      */
     void updateFilteredTaskList(Predicate<Task> predicate);

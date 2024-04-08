@@ -33,6 +33,7 @@ public interface TaskMasterProStorage {
 
     /**
      * Saves the given {@link ReadOnlyTaskMasterPro} to the storage.
+     *
      * @param taskMasterPro cannot be null.
      * @throws IOException if there was any problem writing to the file.
      */

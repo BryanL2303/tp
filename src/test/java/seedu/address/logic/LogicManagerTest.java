@@ -174,7 +174,7 @@ public class LogicManagerTest {
         assertCommandFailure(addCommand, CommandException.class, expectedMessage, expectedModel);
     }
     @Test
-    public void testNull() {
+    public void execute_modelNotNull_success() {
         assertNotNull(model.getTaskMasterPro());
         assertNotNull(model.getFilteredTaskList());
         assertNotNull(model.getTaskMasterProFilePath());

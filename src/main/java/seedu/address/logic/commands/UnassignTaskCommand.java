@@ -6,6 +6,7 @@ import seedu.address.logic.Messages;
 import seedu.address.logic.commands.exceptions.CommandException;
 import seedu.address.model.Model;
 import seedu.address.model.employee.Employee;
+import seedu.address.model.task.Task;
 
 /**
  * Unassigns a task from an employee.
@@ -43,21 +44,39 @@ public class UnassignTaskCommand extends Command {
      */
     @Override
     public CommandResult execute(Model model) throws CommandException {
+        model.updateFilteredTaskList(Model.PREDICATE_SHOW_ALL_TASKS);
+        model.updateFilteredEmployeeList(Model.PREDICATE_SHOW_ALL_EMPLOYEES);
+        List<Task> taskList = model.getFilteredTaskList();
         List<Employee> employeeList = model.getFilteredEmployeeList();
 
-        boolean checkEmployeeID = false;
+        Task assignTask = null;
+        Employee assignEmployee = null;
 
-        for (Employee employee : employeeList) {
-            int id = employee.getEmployeeId().employeeId;
-
-            if (id == employeeID) {
-                checkEmployeeID = true;
-                Employee updatedEmployee = employee.removeTask(taskID);
-                model.setEmployee(employee, updatedEmployee);
+        for (Task t : taskList) {
+            if (t.getTaskId() == taskID) {
+                assignTask = t;
+                break;
+            }
+        }
+        for (Employee e : employeeList) {
+            if (e.getEmployeeId() == employeeID) {
+                assignEmployee = e;
+                break;
             }
         }
 
-        if (!checkEmployeeID) {
+        if (assignTask != null && assignEmployee != null) {
+            Employee updatedEmployee = assignEmployee.removeTask(assignTask.getTaskId());
+            model.setEmployee(assignEmployee, updatedEmployee);
+            Task updatedTask = assignTask.removeEmployee(assignEmployee.getEmployeeId());
+            model.setTask(assignTask, updatedTask);
+        }
+
+        if (assignTask == null) {
+            throw new CommandException(Messages.MESSAGE_INVALID_TASKID);
+        }
+
+        if (assignEmployee == null) {
             throw new CommandException(Messages.MESSAGE_INVALID_EMPLOYEEID);
         }
 

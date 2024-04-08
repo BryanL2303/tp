@@ -25,15 +25,16 @@ public class MarkCommand extends Command {
 
     /**
      * Constructs a MarkCommand to mark the task at the specified index.
+     *
      * @param targetIndex The index of the task to mark.
      */
     public MarkCommand(int targetIndex) {
-
         this.targetIndex = targetIndex;
     }
 
     /**
      * Executes the MarkCommand to mark a task as completed.
+     *
      * @param model The model in which the command should be executed.
      * @return The result of the command execution.
      * @throws CommandException If there is an error executing the command.
@@ -45,7 +46,7 @@ public class MarkCommand extends Command {
         Task taskToMark = null;
 
         for (Task t : taskList) {
-            if (t.getTaskId().taskId == targetIndex) {
+            if (t.getTaskId() == targetIndex) {
                 model.deleteTask(t);
                 taskToMark = t;
                 taskToMark.markTask();
@@ -62,6 +63,7 @@ public class MarkCommand extends Command {
 
     /**
      * Returns a string representation of this MarkCommand.
+     *
      * @return A string representation of this MarkCommand.
      */
     @Override

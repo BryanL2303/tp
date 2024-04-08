@@ -27,6 +27,12 @@ public class CommandResult {
 
     /**
      * Constructs a {@code CommandResult} with the specified fields.
+     *
+     * @param feedbackToUser The message the user will see based on the results of the command.
+     * @param showHelp To indicate that this is a {@code HelpCommand}.
+     * @param showEmployees To indicate that this is a {@code ListCommand}.
+     * @param showTasks To indicate that this is a {@code ListTasksCommand}.
+     * @param exit To indicate that this is a {@code ExitCommand}.
      */
     public CommandResult(String feedbackToUser, boolean showHelp, boolean showEmployees, boolean showTasks,
                          boolean exit) {
@@ -40,6 +46,8 @@ public class CommandResult {
     /**
      * Constructs a {@code CommandResult} with the specified {@code feedbackToUser},
      * and other fields set to their default value.
+     *
+     * @param feedbackToUser The message the user will see based on the results of the command.
      */
     public CommandResult(String feedbackToUser) {
         this(feedbackToUser, false, false, false, false);

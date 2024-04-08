@@ -11,7 +11,7 @@ import seedu.address.model.Model;
 import seedu.address.model.task.Task;
 
 /**
- * Deletes a task identified using it's displayed index from the address book.
+ * Deletes a task identified using it's displayed index from TaskMasterPro.
  */
 public class DeleteTaskCommand extends Command {
     public static final String COMMAND_WORD = "deletetask";
@@ -37,10 +37,12 @@ public class DeleteTaskCommand extends Command {
         Task taskToDelete;
 
         for (Task t : lastShownList) {
-            if (t.getTaskId().taskId == targetIndex) {
+            if (t.getTaskId() == targetIndex) {
                 taskToDelete = t;
+                taskToDelete.removeAssignments();
                 model.deleteTask(taskToDelete);
-                return new CommandResult(String.format(MESSAGE_DELETE_TASK_SUCCESS, Messages.format(taskToDelete)));
+                return new CommandResult(String.format(MESSAGE_DELETE_TASK_SUCCESS, Messages.format(taskToDelete)),
+                        false, false, true, false);
             }
         }
 

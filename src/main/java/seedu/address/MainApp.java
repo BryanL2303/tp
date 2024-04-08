@@ -15,11 +15,11 @@ import seedu.address.commons.util.ConfigUtil;
 import seedu.address.commons.util.StringUtil;
 import seedu.address.logic.Logic;
 import seedu.address.logic.LogicManager;
+import seedu.address.logic.commands.AssignTaskCommand;
 import seedu.address.model.Model;
 import seedu.address.model.ModelManager;
 import seedu.address.model.ReadOnlyTaskMasterPro;
 import seedu.address.model.ReadOnlyUserPrefs;
-import seedu.address.model.TaskMasterPro;
 import seedu.address.model.UserPrefs;
 import seedu.address.model.util.SampleDataUtil;
 import seedu.address.storage.JsonTaskMasterProStorage;
@@ -68,29 +68,57 @@ public class MainApp extends Application {
     }
 
     /**
-     * Returns a {@code ModelManager} with the data from {@code storage}'s address book and {@code userPrefs}. <br>
-     * The data from the sample address book will be used instead if {@code storage}'s address book is not found,
-     * or an empty address book will be used instead if errors occur when reading {@code storage}'s address book.
+     * Returns a {@code ModelManager} with the data from {@code storage}'s TaskMasterPro and {@code userPrefs}. <br>
+     * The data from the sample TaskMasterPro will be used instead if {@code storage}'s TaskMasterPro is not found,
+     * or an empty TaskMasterPro will be used instead if errors occur when reading {@code storage}'s TaskMasterPro.
      */
     private Model initModelManager(Storage storage, ReadOnlyUserPrefs userPrefs) {
         logger.info("Using data file : " + storage.getTaskMasterProFilePath());
 
         Optional<ReadOnlyTaskMasterPro> taskMasterProOptional;
         ReadOnlyTaskMasterPro initialData;
+        boolean isSampleData = false;
         try {
             taskMasterProOptional = storage.readTaskMasterPro();
             if (!taskMasterProOptional.isPresent()) {
                 logger.info("Creating a new data file " + storage.getTaskMasterProFilePath()
                         + " populated with a sample TaskMasterPro.");
+                isSampleData = true;
             }
             initialData = taskMasterProOptional.orElseGet(SampleDataUtil::getSampleTaskMasterPro);
         } catch (DataLoadingException e) {
             logger.warning("Data file at " + storage.getTaskMasterProFilePath() + " could not be loaded."
-                    + " Will be starting with an empty TaskMasterPro.");
-            initialData = new TaskMasterPro();
+                    + " Will be starting with a default TaskMasterPro.");
+            initialData = SampleDataUtil.getSampleTaskMasterPro();
+            isSampleData = true;
         }
 
-        return new ModelManager(initialData, userPrefs);
+        Model model = new ModelManager(initialData, userPrefs);
+
+        if (isSampleData) {
+            try {
+                AssignTaskCommand atc = new AssignTaskCommand(1, 1);
+                atc.execute(model);
+                atc = new AssignTaskCommand(1, 2);
+                atc.execute(model);
+                atc = new AssignTaskCommand(1, 3);
+                atc.execute(model);
+                atc = new AssignTaskCommand(2, 3);
+                atc.execute(model);
+                atc = new AssignTaskCommand(2, 4);
+                atc.execute(model);
+                atc = new AssignTaskCommand(2, 5);
+                atc.execute(model);
+                atc = new AssignTaskCommand(3, 5);
+                atc.execute(model);
+                atc = new AssignTaskCommand(3, 6);
+                atc.execute(model);
+            } catch (Exception e) {
+                logger.warning("Error with generating sample data.");
+            }
+        }
+
+        return model;
     }
 
     private void initLogging(Config config) {
@@ -101,6 +129,9 @@ public class MainApp extends Application {
      * Returns a {@code Config} using the file at {@code configFilePath}. <br>
      * The default file path {@code Config#DEFAULT_CONFIG_FILE} will be used instead
      * if {@code configFilePath} is null.
+     *
+     * @param configFilePath The path to the config file.
+     * @return The {@code Config} using the file at {@code configFilePath}.
      */
     protected Config initConfig(Path configFilePath) {
         Config initializedConfig;
@@ -140,6 +171,9 @@ public class MainApp extends Application {
      * Returns a {@code UserPrefs} using the file at {@code storage}'s user prefs file path,
      * or a new {@code UserPrefs} with default configuration if errors occur when
      * reading from the file.
+     *
+     * @param storage The file with user preference.
+     * @return The representation of user preference.
      */
     protected UserPrefs initPrefs(UserPrefsStorage storage) {
         Path prefsFilePath = storage.getUserPrefsFilePath();

@@ -45,7 +45,6 @@ public abstract class UiPart<T> {
 
     /**
      * Constructs a UiPart with the specified FXML file within {@link #FXML_FILE_FOLDER} and root object.
-     * @see #UiPart(URL, T)
      */
     public UiPart(String fxmlFileName, T root) {
         this(getFxmlFileUrl(fxmlFileName), root);
@@ -60,6 +59,7 @@ public abstract class UiPart<T> {
 
     /**
      * Loads the object hierarchy from a FXML document.
+     *
      * @param location Location of the FXML document.
      * @param root Specifies the root of the object hierarchy.
      */
@@ -84,5 +84,4 @@ public abstract class UiPart<T> {
         URL fxmlFileUrl = MainApp.class.getResource(fxmlFileNameWithFolder);
         return requireNonNull(fxmlFileUrl);
     }
-
 }

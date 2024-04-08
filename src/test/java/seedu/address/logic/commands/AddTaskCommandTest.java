@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import seedu.address.logic.commands.exceptions.CommandException;
 import seedu.address.model.Model;
 import seedu.address.model.ModelManager;
+import seedu.address.model.task.AssignedEmployees;
 import seedu.address.model.task.Task;
 import seedu.address.model.task.TaskId;
 import seedu.address.model.task.TaskName;
@@ -14,8 +15,9 @@ import seedu.address.model.task.TaskStatus;
 
 public class AddTaskCommandTest {
     @Test
-    public void test() {
-        Task validTask = new Task(new TaskName("Test"), new TaskId(123), new TaskStatus(false));
+    public void execute_addTaskCommand_success() {
+        Task validTask = new Task(new TaskName("Test"), new TaskId(123), new TaskStatus(false),
+                new AssignedEmployees(""));
         Model model = new ModelManager();
 
         AddTaskCommand atc = new AddTaskCommand(validTask);
@@ -25,8 +27,8 @@ public class AddTaskCommandTest {
         } catch (CommandException e) {
             return;
         }
-        assertEquals(123, model.getFilteredTaskList().get(0).getTaskId().taskId);
-        assertEquals("Test", model.getFilteredTaskList().get(0).getName().taskName);
+        assertEquals(123, model.getFilteredTaskList().get(0).getTaskId());
+        assertEquals("Test", model.getFilteredTaskList().get(0).getName());
         assertEquals(atc.toString(), atc2.toString());
     }
 }

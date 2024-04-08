@@ -10,13 +10,13 @@ import seedu.address.model.task.Task;
 
 
 /**
- * Adds a Task to the address book.
+ * Adds a Task to TaskMasterPro.
  */
 public class AddTaskCommand extends Command {
 
     public static final String COMMAND_WORD = "task";
 
-    public static final String MESSAGE_USAGE = COMMAND_WORD + ": Adds a task to the address book. "
+    public static final String MESSAGE_USAGE = COMMAND_WORD + ": Adds a task to TaskMasterPro. "
             + "Parameters: DESCRIPTION \n"
             + "Example: " + COMMAND_WORD + " meeting";
 
@@ -25,7 +25,9 @@ public class AddTaskCommand extends Command {
     private final Task toAdd;
 
     /**
-     * Creates an AddCommand to add the specified {@code Employee}
+     * Creates an AddTaskCommand to add the specified {@code Task}
+     *
+     * @param task An instance of {@code Task}
      */
     public AddTaskCommand(Task task) {
         requireNonNull(task);

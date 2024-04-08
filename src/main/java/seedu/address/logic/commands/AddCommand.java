@@ -14,13 +14,13 @@ import seedu.address.model.Model;
 import seedu.address.model.employee.Employee;
 
 /**
- * Adds an employee to the address book.
+ * Adds an employee to TaskMasterPro.
  */
 public class AddCommand extends Command {
 
     public static final String COMMAND_WORD = "add";
 
-    public static final String MESSAGE_USAGE = COMMAND_WORD + ": Adds a employee to the address book. "
+    public static final String MESSAGE_USAGE = COMMAND_WORD + ": Adds a employee to TaskMasterPro. "
             + "Parameters: "
             + PREFIX_NAME + "NAME "
             + PREFIX_PHONE + "PHONE "
@@ -36,12 +36,14 @@ public class AddCommand extends Command {
             + PREFIX_TAG + "owesMoney";
 
     public static final String MESSAGE_SUCCESS = "New employee added: %1$s";
-    public static final String MESSAGE_DUPLICATE_EMPLOYEE = "This employee already exists in the address book";
+    public static final String MESSAGE_DUPLICATE_EMPLOYEE = "This employee already exists in TaskMasterPro";
 
     private final Employee toAdd;
 
     /**
-     * Creates an AddCommand to add the specified {@code Employee}
+     * Creates an AddCommand to add the specified {@code Employee}.
+     *
+     * @param employee An instance of {@code Employee}.
      */
     public AddCommand(Employee employee) {
         requireNonNull(employee);

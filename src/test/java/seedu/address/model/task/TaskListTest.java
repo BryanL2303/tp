@@ -10,10 +10,11 @@ import seedu.address.model.task.exceptions.TaskNotFoundException;
 
 public class TaskListTest {
     private final TaskList taskList = new TaskList();
-    private final Task task = new Task(new TaskName("Test"), new TaskId(5), new TaskStatus(false));
+    private final Task task = new Task(new TaskName("Test"), new TaskId(5), new TaskStatus(false),
+            new AssignedEmployees(""));
 
     @Test
-    public void contains_task() {
+    public void execute_addRemoveTaskList_success() {
         taskList.add(task);
         assertTrue(taskList.contains(task));
         taskList.remove(task);
@@ -21,12 +22,12 @@ public class TaskListTest {
     }
 
     @Test
-    public void toStringMethod() {
+    public void execute_taskListToString_success() {
         assertEquals(taskList.asUnmodifiableObservableList().toString(), taskList.toString());
     }
 
     @Test
-    public void exceptionTest() {
+    public void execute_removeFromEmptyTaskList_exception() {
         try {
             taskList.remove(task);
         } catch (TaskNotFoundException e) {

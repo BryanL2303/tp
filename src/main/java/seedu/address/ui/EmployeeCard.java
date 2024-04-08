@@ -53,12 +53,12 @@ public class EmployeeCard extends UiPart<Region> {
         this.employee = employee;
         id.setText(displayedIndex + ". ");
 
-        employeeId.setText("Employee ID: " + employee.getEmployeeId().employeeId);
-        name.setText(employee.getName().fullName);
-        phone.setText(employee.getPhone().value);
-        address.setText(employee.getAddress().value);
-        email.setText(employee.getEmail().value);
-        tasks.setText("Task Assigned: " + employee.getTasks().getTasks());
+        employeeId.setText("Employee ID: " + employee.getEmployeeId());
+        name.setText(employee.getName());
+        phone.setText(employee.getPhone());
+        address.setText(employee.getAddress());
+        email.setText(employee.getEmail());
+        tasks.setText("Task Assigned: \n" + employee.getTasks().toString());
         employee.getTags().stream()
                 .sorted(Comparator.comparing(tag -> tag.tagName))
                 .forEach(tag -> tags.getChildren().add(new Label(tag.tagName)));

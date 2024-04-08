@@ -2,7 +2,7 @@
   "employees": [ {
     "employeeId": 1,
     "name": "Employee with invalid name field: Ha!ns Mu@ster",
-    "phone": "9482424",
+    "phone": "94824244",
     "email": "hans@example.com",
     "address": "4th street",
     "tasks" : " "

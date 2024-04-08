@@ -122,8 +122,9 @@ How the parsing works:
 
 The `Model` component,
 
-* stores the address book data i.e., all `Employee` objects (which are contained in a `UniqueEmployeeList` object).
+* stores the TaskMasterPro data i.e., all `Employee` objects (which are contained in a `UniqueEmployeeList` object) and all `Task` objects (which are contained in a `TaskList` object.
 * stores the currently 'selected' `Employee` objects (e.g., results of a search query) as a separate _filtered_ list which is exposed to outsiders as an unmodifiable `ObservableList<Employee>` that can be 'observed' e.g. the UI can be bound to this list so that the UI automatically updates when the data in the list change.
+* stores `Task` objects in a similar manner as with `Employee` objects.
 * stores a `UserPref` object that represents the user’s preferences. This is exposed to the outside as a `ReadOnlyUserPref` objects.
 * does not depend on any of the other three components (as the `Model` represents data entities of the domain, they should make sense on their own without depending on other components)
 
@@ -141,7 +142,7 @@ The `Model` component,
 <img src="images/StorageClassDiagram.png" width="550" />
 
 The `Storage` component,
-* can save both address book data and user preference data in JSON format, and read them back into corresponding objects.
+* can save both TaskMasterPro data and user preference data in JSON format, and read them back into corresponding objects.
 * inherits from both `TaskMasterProStorage` and `UserPrefStorage`, which means it can be treated as either one (if only the functionality of only one is needed).
 * depends on some classes in the `Model` component (because the `Storage` component's job is to save/retrieve objects that belong to the `Model`)
 
@@ -155,94 +156,175 @@ Classes used by multiple components are in the `seedu.TaskMasterPro.commons` pac
 
 This section describes some noteworthy details on how certain features are implemented.
 
-### \[Proposed\] Undo/redo feature
+### \[Proposed\] Add/Delete task
 
-#### Proposed Implementation
+#### Current Implementation
 
-The proposed undo/redo mechanism is facilitated by `VersionedTaskMasterPro`. It extends `TaskMasterPro` with an undo/redo history, stored internally as an `TaskMasterProStateList` and `currentStatePointer`. Additionally, it implements the following operations:
+The current add/delete task feature is designed in a way such that every task has an unique `TaskId` to uniquely identify each task. This is done as there is no explicit constraint stating that tasks cannot have the same name, as such an identifier is required for other aspects of the TaskMasterPro (namely assigning of tasks to employees).
 
-* `VersionedTaskMasterPro#commit()` — Saves the current address book state in its history.
-* `VersionedTaskMasterPro#undo()` — Restores the previous address book state from its history.
-* `VersionedTaskMasterPro#redo()` — Restores a previously undone address book state from its history.
+The unique `TaskId` is assigned by the TaskMasterPro automatically and is also tracked by the TaskMasterPro. It is saved in the common .json file along with other data from TaskMasterPro, and carries over across sessions.
 
-These operations are exposed in the `Model` interface as `Model#commitTaskMasterPro()`, `Model#undoTaskMasterPro()` and `Model#redoTaskMasterPro()` respectively.
+<!--ToDo, add info about corrupt TaskId? -->
 
-Given below is an example usage scenario and how the undo/redo mechanism behaves at each step.
+Given below is an example usage scenario and how the add/delete task feature behaves at each step.
 
-Step 1. The user launches the application for the first time. The `VersionedTaskMasterPro` will be initialized with the initial address book state, and the `currentStatePointer` pointing to that single address book state.
+Step 1. The user launches the TaskMasterPro. Assume that there are no existing tasks.
 
-![UndoRedoState0](images/UndoRedoState0.png)
+![AddTask0](images/AddTask0.png)
 
-Step 2. The user executes `delete 5` command to delete the 5th employee in the address book. The `delete` command calls `Model#commitTaskMasterPro()`, causing the modified state of the address book after the `delete 5` command executes to be saved in the `TaskMasterProStateList`, and the `currentStatePointer` is shifted to the newly inserted address book state.
+Step 2. The user enters the command `task Meeting`. This creates a new `Task` object with its `TaskId` automatically assigned. Assume that the `TaskId` value is 1.
 
-![UndoRedoState1](images/UndoRedoState1.png)
+![AddTask1](images/AddTask1.png)
 
-Step 3. The user executes `add n/David …​` to add a new employee. The `add` command also calls `Model#commitTaskMasterPro()`, causing another modified address book state to be saved into the `TaskMasterProStateList`.
+Step 3. The user enters the command `task Project`. This creates another new `Task` object with its `TaskId` automatically assigned. Assume that the `TaskId` value is 2.
 
-![UndoRedoState2](images/UndoRedoState2.png)
+![AddTask2](images/AddTask2.png)
 
-<div markdown="span" class="alert alert-info">:information_source: **Note:** If a command fails its execution, it will not call `Model#commitTaskMasterPro()`, so the address book state will not be saved into the `TaskMasterProStateList`.
+Step 4. The user now enters the command `deletetask 1`. This will delete the task created in Step 2. as its assigned `TaskId` is 1.
 
-</div>
+<div markdown="span" class="alert alert-info">:information_source: **Note:** If an invalid `TaskId` is entered instead, an error will appear informing the user and nothing else will happen.
 
-Step 4. The user now decides that adding the employee was a mistake, and decides to undo that action by executing the `undo` command. The `undo` command will call `Model#undoTaskMasterPro()`, which will shift the `currentStatePointer` once to the left, pointing it to the previous address book state, and restores the address book to that state.
+![AddTask3](images/AddTask3.png)
 
-![UndoRedoState3](images/UndoRedoState3.png)
 
-<div markdown="span" class="alert alert-info">:information_source: **Note:** If the `currentStatePointer` is at index 0, pointing to the initial TaskMasterPro state, then there are no previous TaskMasterPro states to restore. The `undo` command uses `Model#canUndoTaskMasterPro()` to check if this is the case. If so, it will return an error to the user rather
-than attempting to perform the undo.
 
-</div>
+The following sequence diagram shows how an add task operation goes through the `Logic` component:
 
-The following sequence diagram shows how an undo operation goes through the `Logic` component:
+![AddTaskSequence](images/AddTaskSequence.png)
 
-![UndoSequenceDiagram](images/UndoSequenceDiagram-Logic.png)
-
-<div markdown="span" class="alert alert-info">:information_source: **Note:** The lifeline for `UndoCommand` should end at the destroy marker (X) but due to a limitation of PlantUML, the lifeline reaches the end of diagram.
+<div markdown="span" class="alert alert-info">:information_source: **Note:** The lifeline for `AddTaskCommand` should end at the destroy marker (X) but due to a limitation of PlantUML, the lifeline reaches the end of diagram.
 
 </div>
 
-Similarly, how an undo operation goes through the `Model` component is shown below:
+Similarly, how an add task operation goes through the `Model` component is shown below:
 
-![UndoSequenceDiagram](images/UndoSequenceDiagram-Model.png)
+![AddTaskSequence-Model](images/AddTaskSequence-Model.png)
 
-The `redo` command does the opposite — it calls `Model#redoTaskMasterPro()`, which shifts the `currentStatePointer` once to the right, pointing to the previously undone state, and restores the address book to that state.
+The `deletetask` command works similarly  —  it calls `Model#deleteTask` with a given `TaskId` and deletes the `Task` if it exists.
 
-<div markdown="span" class="alert alert-info">:information_source: **Note:** If the `currentStatePointer` is at index `TaskMasterProStateList.size() - 1`, pointing to the latest address book state, then there are no undone TaskMasterPro states to restore. The `redo` command uses `Model#canRedoTaskMasterPro()` to check if this is the case. If so, it will return an error to the user rather than attempting to perform the redo.
-
-</div>
-
-Step 5. The user then decides to execute the command `list`. Commands that do not modify the address book, such as `list`, will usually not call `Model#commitTaskMasterPro()`, `Model#undoTaskMasterPro()` or `Model#redoTaskMasterPro()`. Thus, the `TaskMasterProStateList` remains unchanged.
-
-![UndoRedoState4](images/UndoRedoState4.png)
-
-Step 6. The user executes `clear`, which calls `Model#commitTaskMasterPro()`. Since the `currentStatePointer` is not pointing at the end of the `TaskMasterProStateList`, all address book states after the `currentStatePointer` will be purged. Reason: It no longer makes sense to redo the `add n/David …​` command. This is the behavior that most modern desktop applications follow.
-
-![UndoRedoState5](images/UndoRedoState5.png)
 
 The following activity diagram summarizes what happens when a user executes a new command:
 
-<img src="images/CommitActivityDiagram.png" width="250" />
+<img src="images/AddTaskActivityDiagram.png" width="250" />
+<img src="images/DeleteTaskActivityDiagram.png" width="250" />
 
 #### Design considerations:
 
-**Aspect: How undo & redo executes:**
+**Aspect: How to uniquely identify `Task`:**
 
-* **Alternative 1 (current choice):** Saves the entire address book.
-  * Pros: Easy to implement.
-  * Cons: May have performance issues in terms of memory usage.
+* **Alternative 1 (current choice):** Using of `taskId`.
+    * Pros: Easy to implement. `TaskMasterPro` automatically assigns this value.
+    * Cons: May be hard for users to keep track of.
 
-* **Alternative 2:** Individual command knows how to undo/redo by
-  itself.
-  * Pros: Will use less memory (e.g. for `delete`, just save the employee being deleted).
-  * Cons: We must ensure that the implementation of each individual command are correct.
+* **Alternative 2:** Using of `taskName`.
+    * Pros: An existing field, no additional implementations needed.
+    * Cons: Impossible to uniquely identify tasks as there could be tasks with the same name.
 
-_{more aspects and alternatives to be added}_
+### \[Proposed\] Assign/Unassign task
 
-### \[Proposed\] Data archiving
+#### Current Implementation
 
-_{Explain here how the data archiving feature will be implemented}_
+The current assign/unassign task features are designed such that they accept the ids of a task an employee as a parameter.
+As mentioned above in Add/Delete task a task or employee can have the same name as another task or employee so their ids are the best way to identify them.
 
+To keep track of the assignment of tasks, every employee has an immutable AssignedTasks and every task has an immutable AssignedEmployees.
+
+This object contains a hashtable, for AssignedTasks it contains the TaskId as a key and the corresponding task as the value for that key.
+This is the same for AssignedEmployees which contains a hashtable where EmployeeId is a key and the corresponding employee is the value for that key.
+Both of these gets updated for each call to any of the two functions.
+
+There is also a string variable in each AssignedTasks and AssignedEmployees which contains the keys of existing ids separated by an empty space.
+This String is stored into the JSON file with each Employee or Task so that assignments can be stored between sessions.
+
+Given below is an example usage scenario and how the assign/unassign task feature behaves at each step.
+
+Step 1. The user launches the TaskMasterPro. Assume that there are existing employee with EmployeeId: 1 and existing task with TaskId: 2 and that both were not already assigned to each other.
+
+![AssignTask0](images/AssignTask0.png)
+
+Step 2. The user enters the command `assigntask 2 1`. This updates the AssignedTasks of the employee to put the task into the hashtable and add the string " 2" to the existing string as well as the AssignedEmployees of the task to add the employee in the hashtable and add the string " 1" to the existing string.
+
+Step 3. The user enters the command `unassigntask 2 1`. This updates the AssignedTasks of the employee to remove the task from the hashtable and the AssignedEmployees of the task to remove the employee from the hashtable.
+
+Both of the above command will call a function in Task and Employee which will call a function in AssignedEmployees and AssignedTasks respectively.
+
+![AssignTask](images/AssignTask.png)
+
+Step 4. The user now enters the command `unassigntask 2 1` again. This will return an error as they are no longer assigned to each other to begin with.
+
+<div markdown="span" class="alert alert-info">:information_source: **Note:** If an invalid `TaskId` or `EmployeeId` is entered instead, an error will appear informing the user and nothing else will happen.
+
+The following sequence diagram shows how an assign task operation goes through the `Logic` component:
+
+![AssignTaskSequence](images/AssignTaskSequence.png)
+
+</div>
+
+Similarly, how an assign task operation goes through the `Model` component is shown below:
+
+![AssignTaskSequence-Model](images/AssignTaskSequence-Model.png)
+
+
+The following activity diagram summarizes what happens when a user executes a new command:
+
+<img src="images/AssignTaskActivityDiagram.png" width="250" />
+
+#### Design considerations:
+
+**Aspect: How to store `AssignedTasks`/`AssignedEmployees` into JSON:**
+
+* **Alternative 1 (current choice):** Using both String variable with the ids separated by spaces and a hashtable for functions to access.
+    * Pros: The most straightforward approach. Both approaches described after this requires some complex functions for certain functions.
+    * Cons: Whenever we update `AssignedTasks` or `AssignedEmployees` we have to update both the hashtable and the String and ensure that both are in sync.
+
+* **Alternative 2:** Using only the String variable.
+    * Pros: Extremely easy to understand.
+    * Cons: Each time we want to access any task or employee we have to iterate through the split string and then iterate through every task/employee to compare the ids.
+
+* **Alternative 3:** Using only the hashtable.
+    * Pros: We can easily access the assigned tasks and employees so that we do not need to loop and compare every id each function call.
+    * Cons: When we try to store or load the stored JSON data to the hashtable we have to go through quite a complicated process to do it in the right order.
+
+### \[Proposed\] Find task by name
+
+#### Current Implementation
+
+The current find task by name feature is designed such that it accepts a string as a parameter.
+
+The string will be split using whitespaces to form keywords and the tasks will be filtered based on whether their names contain at least 1 of the keywords.
+
+The search is case-insensitive and the order of the keywords does not matter.
+
+Only full words are matched, so if the task name is "meeting with client" and the user searches for "meet", the task will not be found.
+
+Given below is an example usage scenario and how the find task by name feature behaves at each step.
+
+Step 1. The user launches the TaskMasterPro. Assume that there are existing tasks with names "Project 1 Meeting", "Client Meeting" and "Complete Project 2".
+
+Step 2. The user enters the command `findtasks meeting`. This returns "Project 1 Meeting" and "Client Meeting".
+
+The following sequence diagram shows how a `findtasks` operation goes through the `Logic` component:
+![FindTasksSequence-Model](images/FindTasksSequenceDiagram.png)
+
+The following activity diagram summarizes what happens when a user executes `findtasks project meeting`:
+
+![FindTasksActivityDiagram](images/FindTasksActivityDiagram.png)
+
+
+#### Design considerations:
+
+**Aspect: Whether to make both `find` and `findtasks` inherit from a common parent class:**
+
+This is because both `find` and `findtasks` are similar in terms of functionality. `find` finds employees and `findtasks` finds tasks.
+
+* **Alternative 1 (current choice):** Keep them separate.
+    * Pros: Easier to understand and organise because currently all the classes related to employee
+    are in the `model.employee` package and all the classes related to task are in the `model.task` package.
+    * Cons: There will be code duplication because their implementations are similar.
+
+* **Alternative 2 :** Make both `find` and `findtasks` inherit from a parent class.
+    * Pros: Reduces code duplication.
+    * Cons: May be harder to understand and organise.
 
 --------------------------------------------------------------------------------------------------------------------
 
@@ -263,8 +345,8 @@ _{Explain here how the data archiving feature will be implemented}_
 **Target user profile**: Managers who
 
 * manage many employees
-* prefers command line input 
-* comfortable with manually editing save file 
+* prefers command line input
+* comfortable with manually editing save file
 
 **Value proposition**: manage employees faster than a typical mouse/GUI driven app
 
@@ -274,22 +356,23 @@ _{Explain here how the data archiving feature will be implemented}_
 Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unlikely to have) - `*`
 
 | Priority | As a …​                                    | I want to …​                                 | So that I can…​                                                   |
-|----------| ------------------------------------------ |----------------------------------------------|-------------------------------------------------------------------|
-| `* * *`  | new user                                   | see usage instructions                       | refer to instructions when I forget how to use the App            |
-| `* * *`  | user                                       | add a new employee                             | keep a employee on record                                           |
-| `* * *`  | user                                       | delete a employee                              | remove entries that I no longer need                              |
-| `* * *`  | user                                       | list all recorded employees                    | locate details of all employees in a list                           |
-| `* * *`  | user                                       | add a new task                               | keep upcoming tasks on record                                     |
-| `* * *`  | user                                       | delete a task                                | remove entries that I no longer need                              |
-| `* * *`  | user                                       | list all recorded tasks                      | locate details of all tasks in a list                             |
-| `* * *`  | user                                       | assign a employee to a tasks                   | keep track of who is supposed to contribute to a task             |
-| `* * *`  | user                                       | unassign a employee from a task                | update changes in manpower allocation                             |
-| `* * *`  | user                                       | list all tasks with their assigned employees | locate details of all tasks while seeing who are assigned to them |
-| `* * *`  | user                                       | mark a task as done                          | keep track of task completion                                     |
-| `* * *`  | user                                       | unmark a marked task                         | undo wrongly marked tasks                                         |
-| `* * *`  | user                                       | save current data                            | keep track of all data even after exiting                         |
-| `* * *`  | user                                       | load saved data                              | use the data that was saved previously                            |
-| `*`      | user with many employees in the address book | sort employees by name                         | locate a employee easily                                            |
+|---------| ------------------------------------------ |----------------------------------------------|-------------------------------------------------------------------|
+| `* * *` | new user                                   | see usage instructions                       | refer to instructions when I forget how to use the App            |
+| `* * *` | user                                       | add a new employee                           | keep a employee on record                                         |
+| `* * *` | user                                       | delete a employee                            | remove entries that I no longer need                              |
+| `* * *` | user                                       | list all recorded employees                  | locate details of all employees in a list                         |
+| `* * *` | user                                       | add a new task                               | keep upcoming tasks on record                                     |
+| `* * *` | user                                       | delete a task                                | remove entries that I no longer need                              |
+| `* * *` | user                                       | list all recorded tasks                      | locate details of all tasks in a list                             |
+| `* * *` | user                                       | assign a employee to a tasks                 | keep track of who is supposed to contribute to a task             |
+| `* * *` | user                                       | unassign a employee from a task              | update changes in manpower allocation                             |
+| `* * *` | user                                       | list all tasks with their assigned employees | locate details of all tasks while seeing who are assigned to them |
+| `* * *` | user                                       | mark a task as done                          | keep track of task completion                                     |
+| `* * *` | user                                       | unmark a marked task                         | undo wrongly marked tasks                                         |
+| `* * *` | user                                       | save current data                            | keep track of all data even after exiting                         |
+| `* * *` | user                                       | load saved data                              | use the data that was saved previously                            |
+| `* * `  | user                                       | find tasks by name                           | quickly locate specific tasks that I remember                     |
+| `*`     | user with many employees in the TaskMasterPro | sort employees by name                       | locate a employee easily                                          |
 
 *{More to be added for v1.3}*
 
@@ -297,7 +380,7 @@ Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unli
 
 (For all use cases below, the **System** is the `TaskMasterPro` and the **Actor** is the `user`, unless specified otherwise)
 
-**Use case: Delete a employee**
+**Use case: Delete an employee**
 
 **MSS**
 
@@ -343,14 +426,14 @@ Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unli
 
       Use case resumes at step 2.
 
-**Use case: Assign/unassign a employee to a task**
+**Use case: Assign/unassign an employee to a task**
 
 **MSS**
 
 1.  User requests to list employees
-2.  TaskMasterPro shows a list of employees with their ids 
-3.  User requests to list tasks 
-4.  TaskMasterPro shows a list of tasks with their ids 
+2.  TaskMasterPro shows a list of employees with their ids
+3.  User requests to list tasks
+4.  TaskMasterPro shows a list of tasks with their ids
 5.  User requests to assign/un-assign a specific employee in the employee list by their id to a specific task in the task list by its id
 6.  TaskMasterPro assigns/un-assigns the employee to the task
 
@@ -372,14 +455,14 @@ Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unli
 
       Use case resumes at step 2/4.
 
-**Use case: Mark/unmark a task as done/not done**
+**Use case: Mark a task as done**
 
 **MSS**
 
 1.  User requests to list tasks
 2.  TaskMasterPro shows a list of tasks with their ids
-3.  User requests to mark/unmark a specific task in the list by their id as done/not done
-4.  TaskMasterPro marks/unmarks that task as done/not done.
+3.  User requests to mark a specific task in the list by their id as done
+4.  TaskMasterPro marks that task as done/not done.
 
     Use case ends.
 
@@ -395,7 +478,39 @@ Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unli
 
       Use case resumes at step 2.
 
-*{More to be added}*
+![Interactions Inside the Logic Component for the `mark 1` Command](images/MarkDiagram.png)
+![Interactions for mark for the `mark 1` command](images/MarkRefDiagram.png)
+<br>
+Note that if none of the taskId == 1, an invalid taskId exception will be thrown.
+
+
+**Use case: Unmark a task as not done**
+
+**MSS**
+
+1.  User requests to list tasks
+2.  TaskMasterPro shows a list of tasks with their ids
+3.  User requests to unmark a specific task in the list by their id
+4.  TaskMasterPro unmarks that task as not done.
+
+    Use case ends.
+
+**Extensions**
+
+* 2a. The list is empty.
+
+  Use case ends.
+
+* 3a. The given id is invalid.
+
+    * 3a1. TaskMasterPro shows an error message.
+
+      Use case resumes at step 2.
+
+![Interactions Inside the Logic Component for the `unmark 1` Command](images/UnmarkDiagram.png)
+![Interactions for unmark for the `unmark 1` command](images/UnmarkRefDiagram.png)
+
+Note that if none of the taskId == 1, an invalid taskId exception will be thrown.
 
 ### Non-Functional Requirements
 
@@ -419,7 +534,6 @@ Given below are instructions to test the app manually.
 
 <div markdown="span" class="alert alert-info">:information_source: **Note:** These instructions only provide a starting point for testers to work on;
 testers are expected to do more *exploratory* testing.
-
 </div>
 
 ### Launch and shutdown

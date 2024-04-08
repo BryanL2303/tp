@@ -25,21 +25,22 @@ import seedu.address.model.employee.Address;
 import seedu.address.model.employee.AssignedTasks;
 import seedu.address.model.employee.Email;
 import seedu.address.model.employee.Employee;
+import seedu.address.model.employee.EmployeeId;
 import seedu.address.model.employee.Name;
 import seedu.address.model.employee.Phone;
 import seedu.address.model.tag.Tag;
 
 /**
- * Edits the details of an existing employee in the address book.
+ * Edits the details of an existing employee in TaskMasterPro.
  */
 public class EditCommand extends Command {
 
     public static final String COMMAND_WORD = "edit";
 
     public static final String MESSAGE_USAGE = COMMAND_WORD + ": Edits the details of the employee identified "
-            + "by the index number used in the displayed employee list. "
+            + "by the given EmployeeId. "
             + "Existing values will be overwritten by the input values.\n"
-            + "Parameters: INDEX (must be a positive integer) "
+            + "Parameters: EmployeeId (must be a positive integer) "
             + "[" + PREFIX_NAME + "NAME] "
             + "[" + PREFIX_PHONE + "PHONE] "
             + "[" + PREFIX_EMAIL + "EMAIL] "
@@ -51,7 +52,7 @@ public class EditCommand extends Command {
 
     public static final String MESSAGE_EDIT_EMPLOYEE_SUCCESS = "Edited Employee: %1$s";
     public static final String MESSAGE_NOT_EDITED = "At least one field to edit must be provided.";
-    public static final String MESSAGE_DUPLICATE_EMPLOYEE = "This employee already exists in the address book.";
+    public static final String MESSAGE_DUPLICATE_EMPLOYEE = "This employee already exists in TaskMasterPro.";
 
     private final Index index;
     private final EditEmployeeDescriptor editEmployeeDescriptor;
@@ -73,11 +74,19 @@ public class EditCommand extends Command {
         requireNonNull(model);
         List<Employee> lastShownList = model.getFilteredEmployeeList();
 
-        if (index.getZeroBased() >= lastShownList.size()) {
+        Employee employeeToEdit = null;
+
+        for (Employee e : lastShownList) {
+            if (e.getEmployeeId() == index.getOneBased()) {
+                employeeToEdit = e;
+                break;
+            }
+        }
+
+        if (employeeToEdit == null) {
             throw new CommandException(Messages.MESSAGE_INVALID_EMPLOYEEID);
         }
 
-        Employee employeeToEdit = lastShownList.get(index.getZeroBased());
         Employee editedEmployee = createEditedEmployee(employeeToEdit, editEmployeeDescriptor);
 
         if (!employeeToEdit.isSameEmployee(editedEmployee) && model.hasEmployee(editedEmployee)) {
@@ -97,14 +106,14 @@ public class EditCommand extends Command {
                                                  EditEmployeeDescriptor editEmployeeDescriptor) {
         assert employeeToEdit != null;
 
-        Name updatedName = editEmployeeDescriptor.getName().orElse(employeeToEdit.getName());
-        Phone updatedPhone = editEmployeeDescriptor.getPhone().orElse(employeeToEdit.getPhone());
-        Email updatedEmail = editEmployeeDescriptor.getEmail().orElse(employeeToEdit.getEmail());
-        Address updatedAddress = editEmployeeDescriptor.getAddress().orElse(employeeToEdit.getAddress());
+        Name updatedName = editEmployeeDescriptor.getName().orElse(new Name(employeeToEdit.getName()));
+        Phone updatedPhone = editEmployeeDescriptor.getPhone().orElse(new Phone(employeeToEdit.getPhone()));
+        Email updatedEmail = editEmployeeDescriptor.getEmail().orElse(new Email(employeeToEdit.getEmail()));
+        Address updatedAddress = editEmployeeDescriptor.getAddress().orElse(new Address(employeeToEdit.getAddress()));
         AssignedTasks updatedTask = editEmployeeDescriptor.getTasks().orElse(employeeToEdit.getTasks());
         Set<Tag> updatedTags = editEmployeeDescriptor.getTags().orElse(employeeToEdit.getTags());
 
-        return new Employee(employeeToEdit.getEmployeeId(), updatedName, updatedPhone, updatedEmail,
+        return new Employee(new EmployeeId(employeeToEdit.getEmployeeId()), updatedName, updatedPhone, updatedEmail,
                 updatedAddress, updatedTask, updatedTags);
     }
 
@@ -149,6 +158,8 @@ public class EditCommand extends Command {
         /**
          * Copy constructor.
          * A defensive copy of {@code tags} is used internally.
+         *
+         * @param toCopy The variables to set for the current {@code Employee}.
          */
         public EditEmployeeDescriptor(EditEmployeeDescriptor toCopy) {
             setName(toCopy.name);
@@ -161,6 +172,8 @@ public class EditCommand extends Command {
 
         /**
          * Returns true if at least one field is edited.
+         *
+         * @return true if any field is edited.
          */
         public boolean isAnyFieldEdited() {
             return CollectionUtil.isAnyNonNull(name, phone, email, address, tasks, tags);

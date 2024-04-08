@@ -1,9 +1,11 @@
 package seedu.address.model.task;
 
 import seedu.address.commons.util.ToStringBuilder;
+import seedu.address.logic.commands.exceptions.CommandException;
+import seedu.address.model.employee.Employee;
 
 /**
- * Represents a Task in the address book.
+ * Represents a Task in the TaskMasterPro.
  */
 public class Task {
     // Identity fields
@@ -11,13 +13,16 @@ public class Task {
     private final TaskName taskName;
     private final TaskId taskId;
     private final TaskStatus taskStatus;
+    private final AssignedEmployees employees;
+
     /**
      * Every field must be present and not null.
      */
-    public Task(TaskName name, TaskId id, TaskStatus status) {
+    public Task(TaskName name, TaskId id, TaskStatus status, AssignedEmployees employees) {
         taskName = name;
         taskId = id;
         taskStatus = status;
+        this.employees = employees;
     }
 
     /**
@@ -38,15 +43,18 @@ public class Task {
         Task.universalTaskId++;
     }
 
-    public TaskName getName() {
-        return taskName;
+    public String getName() {
+        return taskName.getTaskName();
     }
 
-    public TaskId getTaskId() {
-        return taskId;
+    public int getTaskId() {
+        return taskId.getId();
     }
-    public TaskStatus getTaskStatus() {
-        return taskStatus;
+    public String getTaskStatus() {
+        return taskStatus.toString();
+    }
+    public AssignedEmployees getEmployees() {
+        return employees;
     }
 
     public void markTask() {
@@ -55,6 +63,50 @@ public class Task {
 
     public void unmarkTask() {
         taskStatus.setTaskNotDone();
+    }
+
+    /**
+     * Assigns an employee to the task by updating the task's employee list with the given employee ID.
+     *
+     * @param employee The employee to be assigned to the task.
+     * @return The updated Task object with the assigned employee.
+     * @throws CommandException If the employee ID is already present in the task's employee list.
+     */
+    public Task assignEmployee(Employee employee) throws CommandException {
+        AssignedEmployees updatedEmployees = employees.assignEmployee(employee);
+        return new Task(
+                taskName, taskId, taskStatus, updatedEmployees);
+    }
+
+    /**
+     * Removes an employee from the task's assigned employees.
+     *
+     * @param employeeId the ID of the employee to be removed
+     * @return a new Task object with the specified employee removed from its assigned employees
+     * @throws CommandException if the specified employee ID is invalid or the employee cannot be removed
+     */
+    public Task removeEmployee(int employeeId) throws CommandException {
+        AssignedEmployees updatedEmployees = employees.unassignEmployee(employeeId);
+        return new Task(
+                taskName, taskId, taskStatus, updatedEmployees);
+    }
+
+    /**
+     * Removes this task from all assigned employees.
+     * This command will be run before this task is deleted.
+     */
+    public void removeAssignments() {
+        for (int employeeId : employees.getAssignedEmployees().keySet()) {
+            // Retrieve the Employee using the key
+            Employee employee = employees.getAssignedEmployees().get(employeeId);
+
+            // Remove this task from the employee
+            try {
+                employee.removeTask(taskId.getId());
+            } catch (CommandException e) {
+                //Ignore this exception as this error is not important since the Task is being deleted
+            }
+        }
     }
 
     /**
@@ -76,6 +128,7 @@ public class Task {
                 .add("taskId", taskId)
                 .add("taskName", taskName)
                 .add("taskStatus", taskStatus)
+                .add("employees", employees)
                 .toString();
     }
 }

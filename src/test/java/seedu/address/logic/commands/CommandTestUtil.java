@@ -35,8 +35,8 @@ public class CommandTestUtil {
 
 
     public static final String VALID_NAME_BOB = "Bob Choo";
-    public static final String VALID_PHONE_AMY = "11111111";
-    public static final String VALID_PHONE_BOB = "22222222";
+    public static final String VALID_PHONE_AMY = "61111111";
+    public static final String VALID_PHONE_BOB = "62222222";
     public static final String VALID_EMAIL_AMY = "amy@example.com";
     public static final String VALID_EMAIL_BOB = "bob@example.com";
     public static final String VALID_ADDRESS_AMY = "Block 312, Amy Street 1";
@@ -115,7 +115,7 @@ public class CommandTestUtil {
      * Executes the given {@code command}, confirms that <br>
      * - a {@code CommandException} is thrown <br>
      * - the CommandException message matches {@code expectedMessage} <br>
-     * - the address book, filtered employee list and selected employee in {@code actualModel} remain unchanged
+     * - the TaskMasterPro, filtered employee list and selected employee in {@code actualModel} remain unchanged
      */
     public static void assertCommandFailure(Command command, Model actualModel, String expectedMessage) {
         // we are unable to defensively copy the model for comparison later, so we can
@@ -129,13 +129,13 @@ public class CommandTestUtil {
     }
     /**
      * Updates {@code model}'s filtered list to show only the employee at the given {@code targetIndex} in the
-     * {@code model}'s address book.
+     * {@code model}'s TaskMasterPro.
      */
     public static void showEmployeeAtIndex(Model model, Index targetIndex) {
         assertTrue(targetIndex.getZeroBased() < model.getFilteredEmployeeList().size());
 
         Employee employee = model.getFilteredEmployeeList().get(targetIndex.getZeroBased());
-        final String[] splitName = employee.getName().fullName.split("\\s+");
+        final String[] splitName = employee.getName().split("\\s+");
         model.updateFilteredEmployeeList(new NameContainsKeywordsPredicate(Arrays.asList(splitName[0])));
 
         assertEquals(1, model.getFilteredEmployeeList().size());

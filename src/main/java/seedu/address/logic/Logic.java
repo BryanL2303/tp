@@ -17,6 +17,7 @@ import seedu.address.model.task.Task;
 public interface Logic {
     /**
      * Executes the command and returns the result.
+     *
      * @param commandText The command as entered by the user.
      * @return the result of the command execution.
      * @throws CommandException If an error occurs during command execution.
@@ -38,7 +39,7 @@ public interface Logic {
     ObservableList<Task> getFilteredTaskList();
 
     /**
-     * Returns the user prefs' address book file path.
+     * Returns the user prefs' TaskMasterPro file path.
      */
     Path getTaskMasterProFilePath();
 
