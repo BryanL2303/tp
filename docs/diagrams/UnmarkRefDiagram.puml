@@ -16,12 +16,10 @@ UnmarkCommand -> Model : getFilteredTaskList()
 Model --> UnmarkCommand : taskList
 
 loop for each t in taskList
-    UnmarkCommand -> Task: getTaskId()
-    opt taskId == 1
-        UnmarkCommand -> Model : deleteTask(t)
+    opt t.getTaskId() == 1
         UnmarkCommand -> Task : unmarkTask()
-        Task --> UnmarkCommand : taskToUnmark
-        UnmarkCommand -> Model : addTask(taskToUnmark)
+        UnmarkCommand -> Model : setTask(t, taskToUnmark)
+
     end
 end
 @enduml

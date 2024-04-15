@@ -52,7 +52,7 @@ activate MarkCommand
 
 'Put this into a ref block'
 
-group ref [update existing Employee fields]
+group ref [mark Task as done]
 MarkCommand -[hidden]-> Model
 end
 
